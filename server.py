@@ -4,6 +4,8 @@ from tornado.httpserver import HTTPServer
 import tornado.options
 import tornado.autoreload
 import json
+import os
+
 
 
 # debug启动函数
@@ -12,10 +14,16 @@ tornado.autoreload.start()
 tornado.options.define('port', default=80, type=int, help="this is the port > for application")
 tornado.options.define('project', default=[], type=str, multiple=True, help="it's a project dict")
 
+
 # 主处理模块
 class MainHandler(RequestHandler):
     def get(self):
-        self.redirect('/regist', permanent=True)
+        items = ["Item 1", "Item 2", "Item 3"]
+        # self.set_secure_cookie('username', 'zhangwenshuo')
+        self.render('./templates/index.html', title='My Title', items=items)
+        # user = self.get_secure_cookie('username')
+        user = self.get_secure_cookie('username')
+        print(user)
 
 
 # 索引处理模块
@@ -44,14 +52,14 @@ class LoginHandler(RequestHandler):
 
 if __name__ == "__main__":
     # 引进全局变量配置
-    tornado.options.parse_config_file('./config')
+    tornado.options.parse_config_file("./config")
     print(tornado.options.options.port)
     # 路由
     app = Application([
         (r"/", MainHandler),
         (r"/regist", RegisterHandler, {'title': '会员注册'}),
         url(r"/login", LoginHandler, name="login")
-    ])
+    ], cookie_secret='aaa')
     # 看不懂
     tornado.options.parse_command_line()
     # 监听端口,多进程
