@@ -5,7 +5,7 @@
    <body>
      <ul>
        {% for item in items %}
-         <li>{{ escape(item) }}</li>
+         <li><a href="/images/music?name={{ item }}">{{ escape(item) }}</a></li>
        {% end %}
      </ul>
    </body>

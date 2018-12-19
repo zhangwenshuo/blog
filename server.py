@@ -18,48 +18,35 @@ tornado.options.define('project', default=[], type=str, multiple=True, help="it'
 # 主处理模块
 class MainHandler(RequestHandler):
     def get(self):
-        items = ["Item 1", "Item 2", "Item 3"]
-        # self.set_secure_cookie('username', 'zhangwenshuo')
+        path = './static/images/music/'
+        items = os.listdir(path)
         self.render('./templates/index.html', title='My Title', items=items)
-        # user = self.get_secure_cookie('username')
-        user = self.get_secure_cookie('username')
-        print(user)
 
 
-# 索引处理模块
-class IndexHandler(RequestHandler):
+# 图片处理模块
+class ImageHandler(RequestHandler):
     def get(self):
-        self.write("<a href='" + self.reverse_url("login") + "'>用户登录</a>")
+        name = self.get_argument('name')
+        path = './static/images/music/%s' % name
+        path1 = '/static/images/music/%s' % name
+        items = os.listdir(path)
+        self.render('./templates/music.html', path=path1, items=items )
 
-
-# 注册处理模块
-class RegisterHandler(RequestHandler):
-    def initialize(self, title):
-        self.title = title
-
-    def get(self):
-        self.write("注册业务处理:" + str(self.title))
-
-
-# 登录处理模块
-class LoginHandler(RequestHandler):
-    def get(self):
-        self.write("用户登录页面展示")
-
-    def post(self):
-        self.write("用户登录功能处理")
 
 
 if __name__ == "__main__":
     # 引进全局变量配置
     tornado.options.parse_config_file("./config")
     print(tornado.options.options.port)
+    settings = {
+        "static_path": os.path.join(os.path.dirname(__file__), "static"),
+        "cookie_secret" : 'aaa'
+    }
     # 路由
     app = Application([
         (r"/", MainHandler),
-        (r"/regist", RegisterHandler, {'title': '会员注册'}),
-        url(r"/login", LoginHandler, name="login")
-    ], cookie_secret='aaa')
+        (r'/images/music', ImageHandler)
+    ], **settings)
     # 看不懂
     tornado.options.parse_command_line()
     # 监听端口,多进程
